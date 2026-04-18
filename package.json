@@ -1,29 +1,24 @@
 {
-  "name": "nomad-agent-designer",
+  "name": "nomads-design-studio",
+  "private": true,
   "version": "0.1.0",
-  "description": "Design, configure, and deploy autonomous AI agents",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "description": "AI design studio for The Nomads — UAE cement rock art, wood art cement, and mud house construction",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "lint": "eslint src/",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": [
-    "ai",
-    "agents",
-    "autonomous",
-    "orchestration",
-    "designer"
-  ],
-  "author": "raxgax-commits",
-  "license": "MIT",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "tsx": "^4.7.0",
-    "eslint": "^9.0.0",
-    "@types/node": "^20.11.0"
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1"
   }
 }
