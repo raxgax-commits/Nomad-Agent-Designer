@@ -89,6 +89,7 @@ type Draft = {
   answers: Record<string, string>;
   plan: Plan | null;
   imagePrompt: string;
+  interiorPrompt: string;
   imageUrl: string;
   selectedViews: ViewType[];
   interiorDescription: string;
@@ -139,6 +140,7 @@ export default function App() {
   const [answers, setAnswers] = useState<Record<string, string>>(saved?.answers ?? {});
   const [plan, setPlan] = useState<Plan | null>(saved?.plan ?? null);
   const [imagePrompt, setImagePrompt] = useState(saved?.imagePrompt ?? '');
+  const [interiorPrompt, setInteriorPrompt] = useState(saved?.interiorPrompt ?? '');
   const [imageUrl, setImageUrl] = useState(saved?.imageUrl ?? '');
   const [selectedViews, setSelectedViews] = useState<ViewType[]>(saved?.selectedViews ?? ['exterior']);
   const [interiorDescription, setInteriorDescription] = useState(saved?.interiorDescription ?? '');
@@ -154,10 +156,10 @@ export default function App() {
   useEffect(() => {
     saveDraft({
       step, name, description, customerName, customerPhone, customerEmail, siteLocation,
-      sitePhotos, sketches, questions, answers, plan, imagePrompt, imageUrl,
+      sitePhotos, sketches, questions, answers, plan, imagePrompt, interiorPrompt, imageUrl,
       selectedViews, interiorDescription, viewImages, driveLink,
     });
-  }, [step, name, description, customerName, customerPhone, customerEmail, siteLocation, sitePhotos, sketches, questions, answers, plan, imagePrompt, imageUrl, selectedViews, interiorDescription, viewImages, driveLink]);
+  }, [step, name, description, customerName, customerPhone, customerEmail, siteLocation, sitePhotos, sketches, questions, answers, plan, imagePrompt, interiorPrompt, imageUrl, selectedViews, interiorDescription, viewImages, driveLink]);
 
   async function run<T>(stage: LoadingStage, task: () => Promise<T>): Promise<T | null> {
     setError(null);
@@ -207,11 +209,13 @@ export default function App() {
           hasSitePhotos: sitePhotos.length > 0,
           hasSketches: imageSketches.length > 0,
           sketches: imageSketches.slice(0, 2).filter(s => s.base64.length <= 500000),
+          hasInterior: true,
         }),
       );
       if (res) {
         setPlan(res.plan);
         setImagePrompt(res.imagePrompt);
+        if (res.interiorPrompt) setInteriorPrompt(res.interiorPrompt);
         setStep('plan');
       } else {
         setRetryFn(() => attempt);
@@ -226,6 +230,8 @@ export default function App() {
   const buildViewPrompt = (view: ViewType) => {
     if (view === 'exterior') return imagePrompt;
 
+    if (view === 'interior' && interiorPrompt) return interiorPrompt;
+
     const designDesc = imagePrompt
       .replace(/Keep the entire existing photo exactly unchanged[^.]*\./i, '')
       .replace(/all background, sky, ground, and surroundings must remain identical\.\s*/i, '')
@@ -233,9 +239,7 @@ export default function App() {
 
     const viewInstructions: Record<ViewType, string> = {
       exterior: '',
-      interior: interiorDescription
-        ? `Interior view: ${interiorDescription}. The building features: `
-        : 'Interior view of a traditional building showing the inside rooms, walls, ceiling, and floor details. The building features: ',
+      interior: 'Interior view of this building showing the inside rooms, walls, ceiling, and floor details. The building features: ',
       sideProfile: 'Side profile architectural view showing the full width and height of the building from the side. The building features: ',
       birdsEye: "Aerial bird's eye view looking straight down at the building and surrounding area. The building features: ",
     };
@@ -374,6 +378,7 @@ export default function App() {
     setAnswers({});
     setPlan(null);
     setImagePrompt('');
+    setInteriorPrompt('');
     setImageUrl('');
     setSelectedViews(['exterior']);
     setInteriorDescription('');
@@ -430,6 +435,8 @@ export default function App() {
             onPlanChange={setPlan}
             imagePrompt={imagePrompt}
             onPromptChange={setImagePrompt}
+            interiorPrompt={interiorPrompt}
+            onInteriorPromptChange={setInteriorPrompt}
             selectedViews={selectedViews}
             onViewsChange={setSelectedViews}
             interiorDescription={interiorDescription}

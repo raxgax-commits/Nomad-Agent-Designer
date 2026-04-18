@@ -65,8 +65,10 @@ export const api = {
     hasSitePhotos?: boolean;
     hasSketches?: boolean;
     sketches?: Sketch[];
+    hasInterior?: boolean;
+    interiorDescription?: string;
   }) =>
-    post<{ plan: Plan; imagePrompt: string }>('generate-plan', args),
+    post<{ plan: Plan; imagePrompt: string; interiorPrompt?: string }>('generate-plan', args),
 
   generateImageOpenAI: (imagePrompt: string) =>
     post<{ imageUrl: string }>('generate-image-openai', { imagePrompt }),

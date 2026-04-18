@@ -7,6 +7,8 @@ type Props = {
   onPlanChange: (plan: Plan) => void;
   imagePrompt: string;
   onPromptChange: (prompt: string) => void;
+  interiorPrompt: string;
+  onInteriorPromptChange: (prompt: string) => void;
   selectedViews: ViewType[];
   onViewsChange: (views: ViewType[]) => void;
   interiorDescription: string;
@@ -15,7 +17,7 @@ type Props = {
   loading: boolean;
 };
 
-export function ConstructionPlan({ plan, onPlanChange, imagePrompt, onPromptChange, selectedViews, onViewsChange, interiorDescription, onInteriorDescriptionChange, onGenerateImage, loading }: Props) {
+export function ConstructionPlan({ plan, onPlanChange, imagePrompt, onPromptChange, interiorPrompt, onInteriorPromptChange, selectedViews, onViewsChange, interiorDescription, onInteriorDescriptionChange, onGenerateImage, loading }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Plan>(plan);
 
@@ -116,10 +118,20 @@ export function ConstructionPlan({ plan, onPlanChange, imagePrompt, onPromptChan
       </div>
 
       <PromptPreview
+        label="Exterior image prompt"
         prompt={imagePrompt}
         onChange={onPromptChange}
         disabled={loading}
       />
+
+      {selectedViews.includes('interior') && interiorPrompt && (
+        <PromptPreview
+          label="Interior image prompt"
+          prompt={interiorPrompt}
+          onChange={onInteriorPromptChange}
+          disabled={loading}
+        />
+      )}
 
       <ViewSelector
         selected={selectedViews}
@@ -284,12 +296,13 @@ function ViewSelector({ selected, onChange, interiorDescription, onInteriorDescr
 }
 
 type PromptPreviewProps = {
+  label?: string;
   prompt: string;
   onChange: (prompt: string) => void;
   disabled: boolean;
 };
 
-function PromptPreview({ prompt, onChange, disabled }: PromptPreviewProps) {
+function PromptPreview({ label = 'Image prompt', prompt, onChange, disabled }: PromptPreviewProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(prompt);
 
@@ -304,7 +317,7 @@ function PromptPreview({ prompt, onChange, disabled }: PromptPreviewProps) {
 
   return (
     <div className="plan-section prompt-preview">
-      <h3>Image prompt</h3>
+      <h3>{label}</h3>
       <p className="muted">
         This prompt will be sent to the image generator. Review and edit if needed before generating.
       </p>
