@@ -661,6 +661,22 @@ textarea { resize: vertical; }
   font-family: var(--font-sans);
   font-size: 14px;
 }
+.interior-field {
+  margin-bottom: 8px;
+}
+.interior-field span {
+  font-size: 13px;
+  color: var(--brown-600);
+  font-weight: 500;
+}
+.interior-field input {
+  width: 100%;
+  margin-top: 2px;
+}
+.interior-summary {
+  margin-top: 8px;
+  font-size: 12px;
+}
 
 /* ========== View tabs ========== */
 .view-tabs {

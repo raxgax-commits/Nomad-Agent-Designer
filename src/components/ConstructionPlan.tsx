@@ -279,17 +279,11 @@ function ViewSelector({ selected, onChange, interiorDescription, onInteriorDescr
         ))}
       </div>
       {selected.includes('interior') && (
-        <div className="interior-desc">
-          <label htmlFor="interior-desc">Describe the interior (optional — leave empty for AI to decide)</label>
-          <textarea
-            id="interior-desc"
-            value={interiorDescription}
-            onChange={e => onInteriorDescriptionChange(e.target.value)}
-            rows={3}
-            placeholder="e.g. Open-plan living area with traditional Emirati arches, polished concrete floor, warm lighting"
-            disabled={disabled}
-          />
-        </div>
+        <InteriorQuestions
+          value={interiorDescription}
+          onChange={onInteriorDescriptionChange}
+          disabled={disabled}
+        />
       )}
     </div>
   );
@@ -357,6 +351,61 @@ function PromptPreview({ label = 'Image prompt', prompt, onChange, disabled }: P
             Edit prompt
           </button>
         </>
+      )}
+    </div>
+  );
+}
+
+const INTERIOR_QUESTIONS = [
+  { key: 'rooms', label: 'Which rooms or spaces?', placeholder: 'e.g. Majlis, entrance hall, bathroom, kitchen' },
+  { key: 'walls', label: 'Wall & ceiling finish', placeholder: 'e.g. Hand-plastered mud, natural stone, carved gypsum' },
+  { key: 'flooring', label: 'Flooring', placeholder: 'e.g. Polished concrete, stone tiles, traditional rugs' },
+  { key: 'lighting', label: 'Lighting style', placeholder: 'e.g. Brass lanterns, recessed, natural light through mashrabiya' },
+  { key: 'furniture', label: 'Furniture & fixtures', placeholder: 'e.g. Built-in seating, low cushions, wooden shelves, fireplace' },
+  { key: 'extras', label: 'Anything else?', placeholder: 'e.g. Arched doorways, niches in walls, indoor plants' },
+];
+
+type InteriorQuestionsProps = {
+  value: string;
+  onChange: (desc: string) => void;
+  disabled: boolean;
+};
+
+function InteriorQuestions({ value, onChange, disabled }: InteriorQuestionsProps) {
+  const parsed: Record<string, string> = (() => {
+    try { return JSON.parse(value || '{}'); } catch { return {}; }
+  })();
+
+  const isStructured = typeof parsed === 'object' && !Array.isArray(parsed) && value.startsWith('{');
+
+  const answers = isStructured ? parsed : {};
+
+  const update = (key: string, val: string) => {
+    const next = { ...answers, [key]: val };
+    onChange(JSON.stringify(next));
+  };
+
+  const summary = INTERIOR_QUESTIONS
+    .filter(q => answers[q.key]?.trim())
+    .map(q => `${q.label}: ${answers[q.key].trim()}`)
+    .join('. ');
+
+  return (
+    <div className="interior-desc">
+      <p className="muted">Help the AI understand your interior vision:</p>
+      {INTERIOR_QUESTIONS.map(q => (
+        <label key={q.key} className="field interior-field">
+          <span>{q.label}</span>
+          <input
+            value={answers[q.key] || ''}
+            onChange={e => update(q.key, e.target.value)}
+            placeholder={q.placeholder}
+            disabled={disabled}
+          />
+        </label>
+      ))}
+      {summary && (
+        <p className="muted interior-summary">AI will use: <em>{summary}</em></p>
       )}
     </div>
   );

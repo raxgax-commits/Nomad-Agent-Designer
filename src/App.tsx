@@ -227,10 +227,29 @@ export default function App() {
   const firstImageSketch = sketches.find(s => !s.isCad);
   const fluxInputImage = firstImageSketch?.base64 ?? (sitePhotos.length > 0 ? sitePhotos[0].base64 : undefined);
 
+  const buildInteriorFromAnswers = (): string => {
+    let answers: Record<string, string> = {};
+    try { answers = JSON.parse(interiorDescription || '{}'); } catch { return interiorDescription; }
+    const parts: string[] = [];
+    if (answers.rooms) parts.push(`Rooms: ${answers.rooms}`);
+    if (answers.walls) parts.push(`Walls & ceiling: ${answers.walls}`);
+    if (answers.flooring) parts.push(`Flooring: ${answers.flooring}`);
+    if (answers.lighting) parts.push(`Lighting: ${answers.lighting}`);
+    if (answers.furniture) parts.push(`Furniture: ${answers.furniture}`);
+    if (answers.extras) parts.push(answers.extras);
+    return parts.length > 0 ? parts.join('. ') + '.' : '';
+  };
+
   const buildViewPrompt = (view: ViewType) => {
     if (view === 'exterior') return imagePrompt;
 
-    if (view === 'interior' && interiorPrompt) return interiorPrompt;
+    if (view === 'interior') {
+      if (interiorPrompt) return interiorPrompt;
+      const userInput = buildInteriorFromAnswers();
+      if (userInput) {
+        return `Interior view of a traditional building. ${userInput} Photorealistic, warm ambient lighting, natural materials and textures, no CGI look.`;
+      }
+    }
 
     const designDesc = imagePrompt
       .replace(/Keep the entire existing photo exactly unchanged[^.]*\./i, '')
