@@ -346,6 +346,7 @@ export default function App() {
           plan,
           imagePrompt,
           imageUrl,
+          viewImages: viewImages.map(vi => ({ view: vi.view, url: vi.url })),
           notes,
           ...(corrections ? { corrections, correctionCategory } : {}),
         }),

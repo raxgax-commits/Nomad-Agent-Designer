@@ -1,4 +1,4 @@
-import type { Plan, ProjectStatus, Question, Sketch, SitePhoto } from '../types';
+import type { Plan, ProjectStatus, Question, Sketch, SitePhoto, ViewImage } from '../types';
 
 const BASE = import.meta.env.VITE_N8N_BASE_URL;
 const KEY = import.meta.env.VITE_N8N_SHARED_KEY;
@@ -44,6 +44,7 @@ export type SaveProjectInput = {
   plan: Plan;
   imagePrompt: string;
   imageUrl: string;
+  viewImages?: { view: string; url: string }[];
   notes: string;
   corrections?: string;
   correctionCategory?: string;
